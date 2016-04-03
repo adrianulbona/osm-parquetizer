@@ -27,7 +27,7 @@ public class RelationWriteSupport extends OsmEntityWriteSupport<Relation> {
     protected MessageType getSchema() {
         final List<Type> attributes = new ArrayList<>(getCommonAttributes());
         attributes.add(membersType);
-        return new MessageType("members", attributes);
+        return new MessageType("relation", attributes);
     }
 
     @Override
