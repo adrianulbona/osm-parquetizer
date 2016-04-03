@@ -34,7 +34,8 @@ public class ParquetSink<T extends Entity> implements Sink {
     public void initialize(Map<String, Object> metaData) {
         final String pbfName = source.getFileName().toString();
         final String entityName = entityType.name().toLowerCase();
-        final Path destination = source.getParent().resolve(format("%s.%s.parquet", pbfName, entityName));
+        final Path parentFolder = source.toAbsolutePath().getParent();
+        final Path destination = parentFolder.resolve(format("%s.%s.parquet", pbfName, entityName));
         try {
             this.writer = ParquetWriterFactory.buildFor(destination.toAbsolutePath().toString(), entityType);
         } catch (IOException e) {
