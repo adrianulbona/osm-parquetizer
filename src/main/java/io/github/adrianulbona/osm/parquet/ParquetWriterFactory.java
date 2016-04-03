@@ -1,5 +1,8 @@
 package io.github.adrianulbona.osm.parquet;
 
+import io.github.adrianulbona.osm.parquet.convertor.NodeWriteSupport;
+import io.github.adrianulbona.osm.parquet.convertor.RelationWriteSupport;
+import io.github.adrianulbona.osm.parquet.convertor.WayWriteSupport;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;

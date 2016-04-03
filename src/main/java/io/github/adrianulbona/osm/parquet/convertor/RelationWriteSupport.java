@@ -1,4 +1,4 @@
-package io.github.adrianulbona.osm.parquet;
+package io.github.adrianulbona.osm.parquet.convertor;
 
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.PrimitiveType;
