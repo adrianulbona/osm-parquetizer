@@ -45,7 +45,7 @@ public class App {
         }
     }
 
-    public static class MultiEntitySinkConfig implements MultiEntitySink.Config {
+    private static class MultiEntitySinkConfig implements MultiEntitySink.Config {
 
         @Argument(metaVar = "pbf-path", usage = "the OSM PBF file to be parquetized", required = true)
         private Path source;
