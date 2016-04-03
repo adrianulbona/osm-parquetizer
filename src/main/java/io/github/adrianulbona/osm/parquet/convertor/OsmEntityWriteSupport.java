@@ -1,4 +1,4 @@
-package io.github.adrianulbona.osm.parquet;
+package io.github.adrianulbona.osm.parquet.convertor;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.hadoop.api.WriteSupport;
@@ -11,7 +11,6 @@ import org.apache.parquet.schema.Type;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

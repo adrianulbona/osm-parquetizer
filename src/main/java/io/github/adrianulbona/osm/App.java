@@ -1,19 +1,26 @@
 package io.github.adrianulbona.osm;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import crosby.binary.osmosis.OsmosisReader;
-import io.github.adrianulbona.osm.parquet.ParquetSink;
-import org.apache.parquet.Log;
-import org.openstreetmap.osmosis.core.domain.v0_6.Way;
-import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+import io.github.adrianulbona.osm.parquet.MultiEntitySink;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
+import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static java.nio.file.Files.newInputStream;
+import static java.util.Collections.unmodifiableList;
+import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
+import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Relation;
 
 
 /**
@@ -22,77 +29,81 @@ import static java.nio.file.Files.newInputStream;
 public class App {
 
     public static void main(String[] args) throws IOException {
-//        final Path source = Paths.get("data", "planet-latest.osm.pbf");
-        final Path source = Paths.get("data", "romania-latest.osm.pbf");
-
-        //final Path source = Paths.get("data", "hungary-150908.osm.pbf");
-        //final Path source = Paths.get("data", "great-britain-latest.osm.pbf");
-/*
-
-
-        final ParquetSink<Way> waysSink = ParquetSink.waysSink(source);
-
-        //waysSink.addFilter(way -> way.getTags().stream().noneMatch(tag -> "highway".equals(tag.getKey())));
-        final WaysSinkObserver observer = new WaysSinkObserver();
-        //waysSink.addObserver(observer);
-        processPbf(source, waysSink);
-
-        ParquetSink<Node> nodeSink = ParquetSink.nodeSink(source);
-        //nodeSink.addFilter(observer.referredNodes::containsValue);
-        processPbf(source, nodeSink);
-*/
-
-        final MultiEntitySink allSink = new MultiEntitySink(source);
-        processPbf(source, allSink);
+        final MultiEntitySinkConfig config = new MultiEntitySinkConfig();
+        final CmdLineParser cmdLineParser = new CmdLineParser(config);
+        try {
+            cmdLineParser.parseArgument(args);
+            final OsmosisReader reader = new OsmosisReader(newInputStream(config.getSource()));
+            final MultiEntitySink sink = new MultiEntitySink(config);
+            sink.addObserver(new MultiEntitySinkObserver());
+            reader.setSink(sink);
+            reader.run();
+        } catch (CmdLineException e) {
+            System.out.println(e.getMessage());
+            //System.out.print("Usage: gradlew run");
+            cmdLineParser.printSingleLineUsage(System.out);
+        }
     }
 
-    public static void processPbf(Path source, Sink sink) throws IOException {
-        final OsmosisReader reader = new OsmosisReader(newInputStream(source));
-        reader.setSink(sink);
-        reader.run();
+    public static class MultiEntitySinkConfig implements MultiEntitySink.Config {
+
+        @Argument(metaVar = "pbf-path", usage = "the OSM PBF file to be parquetized", required = true)
+        private Path source;
+
+        @Option(name = "--no-nodes", usage = "if present the nodes will be not parquetized")
+        private boolean noNodes = false;
+
+        @Option(name = "--no-ways", usage = "if present the ways will be not parquetized")
+        private boolean noWays = false;
+
+        @Option(name = "--no-relations", usage = "if present the relations will not be parquetized")
+        private boolean noRelations = false;
+
+        @Override
+        public Path getSource() {
+            return this.source;
+        }
+
+        @Override
+        public List<EntityType> entitiesToBeParquetized() {
+            final List<EntityType> entityTypes = new ArrayList<>();
+            if (!noNodes) {
+                entityTypes.add(Node);
+            }
+            if (!noWays) {
+                entityTypes.add(EntityType.Way);
+            }
+            if (!noRelations) {
+                entityTypes.add(Relation);
+            }
+            return unmodifiableList(entityTypes);
+        }
     }
 
-    private static class WaysSinkObserver implements ParquetSink.Observer<Way> {
 
-        private static final Log LOGGER = Log.getLog(ParquetSink.class);
+    private static class MultiEntitySinkObserver implements MultiEntitySink.Observer {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(MultiEntitySinkObserver.class);
 
         private AtomicLong totalEntitiesCount;
-        private AtomicLong totalWrittenEntitiesCount;
-        private AtomicLong totalPointsAllWays;
-        private AtomicLong totalPointsAllWrittenWays;
-
-        public Multimap<Integer, Long> referredNodes;
-
 
         @Override
         public void started() {
-            referredNodes = HashMultimap.create();
             totalEntitiesCount = new AtomicLong();
-            totalWrittenEntitiesCount = new AtomicLong();
-            totalPointsAllWays = new AtomicLong();
-            totalPointsAllWrittenWays = new AtomicLong();
         }
 
         @Override
-        public void arrived(Way entity) {
-            totalEntitiesCount.incrementAndGet();
-            totalPointsAllWays.addAndGet(entity.getWayNodes().size());
-        }
+        public void processed(Entity entity) {
+            final long count = totalEntitiesCount.incrementAndGet();
+            if (count % 1000000 == 0) {
+                LOGGER.info("Entities processed: " + count);
 
-        @Override
-        public void writing(Way entity) {
-            totalWrittenEntitiesCount.incrementAndGet();
-            totalPointsAllWrittenWays.addAndGet(entity.getWayNodes().size());
-            entity.getWayNodes().forEach(node -> referredNodes.put((int) (node.getNodeId() % 1000), node.getNodeId()));
+            }
         }
 
         @Override
         public void ended() {
             LOGGER.info("Total entities processed: " + totalEntitiesCount.get());
-            LOGGER.info("Total entities written: " + totalWrittenEntitiesCount.get());
-            LOGGER.info("Total referenced points: " + totalPointsAllWays.get());
-            LOGGER.info("Total referenced points from entities written: " + totalPointsAllWrittenWays.get());
-            referredNodes.keySet().forEach(key -> System.out.println(key + " -> " + referredNodes.get(key).size()));
         }
     }
 }
