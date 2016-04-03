@@ -1,7 +1,6 @@
-package io.github.adrianulbona.osm;
+package io.github.adrianulbona.osm.parquet;
 
 import crosby.binary.osmosis.OsmosisReader;
-import io.github.adrianulbona.osm.parquet.MultiEntitySink;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -40,7 +39,8 @@ public class App {
             reader.run();
         } catch (CmdLineException e) {
             System.out.println(e.getMessage());
-            //System.out.print("Usage: gradlew run");
+            System.out.print("Usage: java -jar osm-parquetizer.jar");
+            System.out.println();
             cmdLineParser.printSingleLineUsage(System.out);
         }
     }
