@@ -26,8 +26,10 @@ public class MultiEntitySink implements Sink {
 
     public MultiEntitySink(Config config) {
         final Path pbfPath = config.getSource();
+        final Path destinationFolderPath = config.getDestinationFolder();
         final List<EntityType> entityTypes = config.entitiesToBeParquetized();
-        this.converters = entityTypes.stream().map(type -> new ParquetSink<>(pbfPath, type)).collect(toList());
+        this.converters = entityTypes.stream().map(type -> new ParquetSink<>(pbfPath, destinationFolderPath, type)).
+                collect(toList());
         this.observers = new ArrayList<>();
     }
 
@@ -75,6 +77,8 @@ public class MultiEntitySink implements Sink {
     public interface Config {
 
         Path getSource();
+
+        Path getDestinationFolder();
 
         List<EntityType> entitiesToBeParquetized();
     }

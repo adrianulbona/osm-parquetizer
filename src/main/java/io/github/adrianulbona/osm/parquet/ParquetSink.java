@@ -19,13 +19,15 @@ import static java.lang.String.format;
 public class ParquetSink<T extends Entity> implements Sink {
 
     private final Path source;
+    private final Path destinationFolder;
     private final EntityType entityType;
     private final List<Predicate<T>> filters;
 
     private ParquetWriter<T> writer;
 
-    public ParquetSink(Path source, EntityType entityType) {
+    public ParquetSink(Path source, Path destinationFolder, EntityType entityType) {
         this.source = source;
+        this.destinationFolder = destinationFolder;
         this.entityType = entityType;
         this.filters = new ArrayList<>();
     }
@@ -34,8 +36,7 @@ public class ParquetSink<T extends Entity> implements Sink {
     public void initialize(Map<String, Object> metaData) {
         final String pbfName = source.getFileName().toString();
         final String entityName = entityType.name().toLowerCase();
-        final Path parentFolder = source.toAbsolutePath().getParent();
-        final Path destination = parentFolder.resolve(format("%s.%s.parquet", pbfName, entityName));
+        final Path destination = destinationFolder.resolve(format("%s.%s.parquet", pbfName, entityName));
         try {
             this.writer = ParquetWriterFactory.buildFor(destination.toAbsolutePath().toString(), entityType);
         } catch (IOException e) {

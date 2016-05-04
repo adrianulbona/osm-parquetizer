@@ -47,8 +47,12 @@ public class App {
 
     private static class MultiEntitySinkConfig implements MultiEntitySink.Config {
 
-        @Argument(metaVar = "pbf-path", usage = "the OSM PBF file to be parquetized", required = true)
+        @Argument(index = 0, metaVar = "pbf-path", usage = "the OSM PBF file to be parquetized", required = true)
         private Path source;
+
+        @Argument(index = 1, metaVar = "output-path", usage = "the directory where to store the Parquet files",
+                required = false)
+        private Path destinationFolder;
 
         @Option(name = "--no-nodes", usage = "if present the nodes will be not parquetized")
         private boolean noNodes = false;
@@ -62,6 +66,11 @@ public class App {
         @Override
         public Path getSource() {
             return this.source;
+        }
+
+        @Override
+        public Path getDestinationFolder() {
+            return this.destinationFolder != null ? this.destinationFolder : this.source.toAbsolutePath().getParent();
         }
 
         @Override
