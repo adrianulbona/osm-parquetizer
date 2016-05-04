@@ -20,7 +20,8 @@ public class NodeWriteSupport extends OsmEntityWriteSupport<Node> {
     private final PrimitiveType latType;
     private final PrimitiveType longType;
 
-    public NodeWriteSupport() {
+    public NodeWriteSupport(boolean excludeMetadata) {
+        super(excludeMetadata);
         latType = new PrimitiveType(REQUIRED, DOUBLE, "latitude");
         longType = new PrimitiveType(REQUIRED, DOUBLE, "longitude");
     }

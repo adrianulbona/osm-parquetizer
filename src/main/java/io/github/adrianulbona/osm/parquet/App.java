@@ -54,6 +54,9 @@ public class App {
                 required = false)
         private Path destinationFolder;
 
+        @Option(name = "--exclude-metadata", usage = "if present the metadata will not be parquetized")
+        private boolean excludeMetadata = false;
+
         @Option(name = "--no-nodes", usage = "if present the nodes will be not parquetized")
         private boolean noNodes = false;
 
@@ -62,6 +65,11 @@ public class App {
 
         @Option(name = "--no-relations", usage = "if present the relations will not be parquetized")
         private boolean noRelations = false;
+
+        @Override
+        public boolean getExcludeMetadata() {
+            return this.excludeMetadata;
+        }
 
         @Override
         public Path getSource() {

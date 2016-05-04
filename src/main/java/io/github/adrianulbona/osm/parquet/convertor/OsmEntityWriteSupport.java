@@ -12,6 +12,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -34,9 +35,11 @@ public abstract class OsmEntityWriteSupport<E extends Entity> extends WriteSuppo
     private final PrimitiveType uidType;
     private final PrimitiveType userSidType;
 
+    private final boolean excludeMetadata;
+
     protected RecordConsumer recordConsumer;
 
-    public OsmEntityWriteSupport() {
+    public OsmEntityWriteSupport(boolean excludeMetadata) {
         idType = new PrimitiveType(REQUIRED, INT64, "id");
         tagKeyType = new PrimitiveType(REQUIRED, BINARY, "key");
         tagValueType = new PrimitiveType(OPTIONAL, BINARY, "value");
@@ -46,10 +49,17 @@ public abstract class OsmEntityWriteSupport<E extends Entity> extends WriteSuppo
         changesetType = new PrimitiveType(OPTIONAL, INT64, "changeset");
         uidType = new PrimitiveType(OPTIONAL, INT32, "uid");
         userSidType = new PrimitiveType(OPTIONAL, BINARY, "user_sid");
+        this.excludeMetadata = excludeMetadata;
     }
 
     protected List<Type> getCommonAttributes() {
-        return asList(idType, versionType, timestampType, changesetType, uidType, userSidType, tags);
+        final List<Type> commonAttributes = new LinkedList<>();
+        commonAttributes.add(idType);
+        if (!excludeMetadata) {
+            commonAttributes.addAll(asList(versionType, timestampType, changesetType, uidType, userSidType));
+        }
+        commonAttributes.add(tags);
+        return commonAttributes;
     }
 
     @Override
@@ -73,25 +83,27 @@ public abstract class OsmEntityWriteSupport<E extends Entity> extends WriteSuppo
         recordConsumer.addLong(record.getId());
         recordConsumer.endField(idType.getName(), index++);
 
-        recordConsumer.startField(versionType.getName(), index);
-        recordConsumer.addInteger(record.getVersion());
-        recordConsumer.endField(versionType.getName(), index++);
+        if (!excludeMetadata) {
+            recordConsumer.startField(versionType.getName(), index);
+            recordConsumer.addInteger(record.getVersion());
+            recordConsumer.endField(versionType.getName(), index++);
 
-        recordConsumer.startField(timestampType.getName(), index);
-        recordConsumer.addLong(record.getTimestamp().getTime());
-        recordConsumer.endField(timestampType.getName(), index++);
+            recordConsumer.startField(timestampType.getName(), index);
+            recordConsumer.addLong(record.getTimestamp().getTime());
+            recordConsumer.endField(timestampType.getName(), index++);
 
-        recordConsumer.startField(changesetType.getName(), index);
-        recordConsumer.addLong(record.getChangesetId());
-        recordConsumer.endField(changesetType.getName(), index++);
+            recordConsumer.startField(changesetType.getName(), index);
+            recordConsumer.addLong(record.getChangesetId());
+            recordConsumer.endField(changesetType.getName(), index++);
 
-        recordConsumer.startField(uidType.getName(), index);
-        recordConsumer.addInteger(record.getUser().getId());
-        recordConsumer.endField(uidType.getName(), index++);
+            recordConsumer.startField(uidType.getName(), index);
+            recordConsumer.addInteger(record.getUser().getId());
+            recordConsumer.endField(uidType.getName(), index++);
 
-        recordConsumer.startField(userSidType.getName(), index);
-        recordConsumer.addBinary(Binary.fromString(record.getUser().getName()));
-        recordConsumer.endField(userSidType.getName(), index++);
+            recordConsumer.startField(userSidType.getName(), index);
+            recordConsumer.addBinary(Binary.fromString(record.getUser().getName()));
+            recordConsumer.endField(userSidType.getName(), index++);
+        }
 
         if (!record.getTags().isEmpty()) {
             recordConsumer.startField(tags.getName(), index);

@@ -26,7 +26,8 @@ public class RelationWriteSupport extends OsmEntityWriteSupport<Relation> {
     private final PrimitiveType memberRoleType;
     private final PrimitiveType memberTypeType;
 
-    public RelationWriteSupport() {
+    public RelationWriteSupport(boolean excludeMetadata) {
+        super(excludeMetadata);
         memberIdType = new PrimitiveType(REQUIRED, INT64, "id");
         memberRoleType = new PrimitiveType(REQUIRED, BINARY, "role");
         memberTypeType = new PrimitiveType(REQUIRED, BINARY, "type");
