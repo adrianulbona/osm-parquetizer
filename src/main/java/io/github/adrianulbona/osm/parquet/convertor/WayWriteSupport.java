@@ -28,7 +28,8 @@ public class WayWriteSupport extends OsmEntityWriteSupport<Way> {
     private final PrimitiveType nodeIdType;
     private final GroupType nodes;
 
-    public WayWriteSupport() {
+    public WayWriteSupport(boolean excludeMetadata) {
+        super(excludeMetadata);
         nodeIndexType = new PrimitiveType(REQUIRED, INT32, "index");
         nodeIdType = new PrimitiveType(REQUIRED, INT64, "nodeId");
         nodes = new GroupType(REPEATED, "nodes", nodeIndexType, nodeIdType);

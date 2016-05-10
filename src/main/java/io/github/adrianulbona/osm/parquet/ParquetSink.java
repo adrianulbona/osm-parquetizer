@@ -20,14 +20,16 @@ public class ParquetSink<T extends Entity> implements Sink {
 
     private final Path source;
     private final Path destinationFolder;
+    private final boolean excludeMetadata;
     private final EntityType entityType;
     private final List<Predicate<T>> filters;
 
     private ParquetWriter<T> writer;
 
-    public ParquetSink(Path source, Path destinationFolder, EntityType entityType) {
+    public ParquetSink(Path source, Path destinationFolder, boolean excludeMetadata, EntityType entityType) {
         this.source = source;
         this.destinationFolder = destinationFolder;
+        this.excludeMetadata = excludeMetadata;
         this.entityType = entityType;
         this.filters = new ArrayList<>();
     }
@@ -38,7 +40,8 @@ public class ParquetSink<T extends Entity> implements Sink {
         final String entityName = entityType.name().toLowerCase();
         final Path destination = destinationFolder.resolve(format("%s.%s.parquet", pbfName, entityName));
         try {
-            this.writer = ParquetWriterFactory.buildFor(destination.toAbsolutePath().toString(), entityType);
+            this.writer = ParquetWriterFactory.buildFor(destination.toAbsolutePath().toString(), excludeMetadata,
+                    entityType);
         } catch (IOException e) {
             throw new RuntimeException("Unable to build writers", e);
         }

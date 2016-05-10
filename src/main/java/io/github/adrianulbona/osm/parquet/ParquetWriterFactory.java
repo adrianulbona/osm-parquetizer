@@ -23,15 +23,15 @@ public class ParquetWriterFactory {
 
     private static final CompressionCodecName COMPRESSION = SNAPPY;
 
-    public static <T extends Entity> ParquetWriter<T> buildFor(String destination, EntityType entityType) throws
-            IOException {
+    public static <T extends Entity> ParquetWriter<T> buildFor(String destination, boolean excludeMetadata,
+            EntityType entityType) throws IOException {
         switch (entityType) {
             case Node:
-                return (ParquetWriter<T>) NodesWriterBuilder.standard(destination);
+                return (ParquetWriter<T>) NodesWriterBuilder.standard(destination, excludeMetadata);
             case Way:
-                return (ParquetWriter<T>) WaysWriterBuilder.standard(destination);
+                return (ParquetWriter<T>) WaysWriterBuilder.standard(destination, excludeMetadata);
             case Relation:
-                return (ParquetWriter<T>) RelationsWriterBuilder.standard(destination);
+                return (ParquetWriter<T>) RelationsWriterBuilder.standard(destination, excludeMetadata);
             default:
                 throw new RuntimeException("Invalid entity type");
         }
@@ -39,8 +39,11 @@ public class ParquetWriterFactory {
 
     public static class WaysWriterBuilder extends ParquetWriter.Builder<Way, WaysWriterBuilder> {
 
-        protected WaysWriterBuilder(Path file) {
+        private final boolean excludeMetadata;
+
+        protected WaysWriterBuilder(Path file, boolean excludeMetadata) {
             super(file);
+            this.excludeMetadata = excludeMetadata;
         }
 
         @Override
@@ -50,20 +53,23 @@ public class ParquetWriterFactory {
 
         @Override
         protected WriteSupport<Way> getWriteSupport(Configuration conf) {
-            return new WayWriteSupport();
+            return new WayWriteSupport(excludeMetadata);
         }
 
-        public static ParquetWriter<Way> standard(String destination) throws IOException {
-            return new WaysWriterBuilder(new Path(destination)).self().withCompressionCodec(COMPRESSION)
-                    .withWriteMode(OVERWRITE).build();
+        public static ParquetWriter<Way> standard(String destination, boolean excludeMetadata) throws IOException {
+            return new WaysWriterBuilder(new Path(destination), excludeMetadata).self()
+                    .withCompressionCodec(COMPRESSION).withWriteMode(OVERWRITE).build();
         }
     }
 
 
     public static class NodesWriterBuilder extends ParquetWriter.Builder<Node, NodesWriterBuilder> {
 
-        protected NodesWriterBuilder(Path file) {
+        private final boolean excludeMetadata;
+
+        protected NodesWriterBuilder(Path file, boolean excludeMetadata) {
             super(file);
+            this.excludeMetadata = excludeMetadata;
         }
 
         @Override
@@ -73,20 +79,23 @@ public class ParquetWriterFactory {
 
         @Override
         protected WriteSupport<Node> getWriteSupport(Configuration conf) {
-            return new NodeWriteSupport();
+            return new NodeWriteSupport(excludeMetadata);
         }
 
-        public static ParquetWriter<Node> standard(String destination) throws IOException {
-            return new NodesWriterBuilder(new Path(destination)).self().withCompressionCodec(COMPRESSION)
-                    .withWriteMode(OVERWRITE).build();
+        public static ParquetWriter<Node> standard(String destination, boolean excludeMetadata) throws IOException {
+            return new NodesWriterBuilder(new Path(destination), excludeMetadata).self()
+                    .withCompressionCodec(COMPRESSION).withWriteMode(OVERWRITE).build();
         }
     }
 
 
     public static class RelationsWriterBuilder extends ParquetWriter.Builder<Relation, RelationsWriterBuilder> {
 
-        protected RelationsWriterBuilder(Path file) {
+        private final boolean excludeMetadata;
+
+        protected RelationsWriterBuilder(Path file, boolean excludeMetadata) {
             super(file);
+            this.excludeMetadata = excludeMetadata;
         }
 
         @Override
@@ -96,12 +105,12 @@ public class ParquetWriterFactory {
 
         @Override
         protected WriteSupport<Relation> getWriteSupport(Configuration conf) {
-            return new RelationWriteSupport();
+            return new RelationWriteSupport(excludeMetadata);
         }
 
-        public static ParquetWriter<Relation> standard(String destination) throws IOException {
-            return new RelationsWriterBuilder(new Path(destination)).self().withCompressionCodec(COMPRESSION)
-                    .withWriteMode(OVERWRITE).build();
+        public static ParquetWriter<Relation> standard(String destination, boolean excludeMetadata) throws IOException {
+            return new RelationsWriterBuilder(new Path(destination), excludeMetadata).self()
+                    .withCompressionCodec(COMPRESSION).withWriteMode(OVERWRITE).build();
         }
     }
 }
