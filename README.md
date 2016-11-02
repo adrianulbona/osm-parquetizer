@@ -12,13 +12,13 @@ In order to get started:
 git clone https://github.com/adrianulbona/osm-parquetizer.git
 cd osm-parquetizer
 mvn clean package
-java -jar target/osm-parquetizer-0.1.0-SNAPSHOT.jar path_to_your.pbf
+java -jar target/osm-parquetizer-1.0.0-SNAPSHOT.jar path_to_your.pbf
 ```
 
 For example, by running: 
 
 ```shell
-java -jar target/osm-parquetizer-0.1.0-SNAPSHOT.jar romania-latest.osm.pbf
+java -jar target/osm-parquetizer-1.0.0-SNAPSHOT.jar romania-latest.osm.pbf
 ```
 
 In a few seconds (on a decent laptop) you should get the following files:
