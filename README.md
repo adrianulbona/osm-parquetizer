@@ -12,13 +12,13 @@ In order to get started:
 git clone https://github.com/adrianulbona/osm-parquetizer.git
 cd osm-parquetizer
 mvn clean package
-java -jar target/osm-parquetizer-1.0.0-SNAPSHOT.jar path_to_your.pbf
+java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar path_to_your.pbf
 ```
 
 For example, by running: 
 
 ```shell
-java -jar target/osm-parquetizer-1.0.0-SNAPSHOT.jar romania-latest.osm.pbf
+java -jar target/osm-parquetizer-1.0.1-SNAPSHOT.jar romania-latest.osm.pbf
 ```
 
 In a few seconds (on a decent laptop) you should get the following files:
@@ -32,46 +32,50 @@ In a few seconds (on a decent laptop) you should get the following files:
 The parquet files have the following schemas:
 
 ```probobuf
-message node {
-  required int64 id;
-  optional int32 version;
-  optional int64 timestamp;
-  optional int64 changeset;
-  optional int32 uid;
-  optional binary user_sid;
-  repeated group tags {
-    required binary key;
-    optional binary value;
-  }
-  required double latitude;
-  required double longitude;
-}
+node
+ |-- id: long (nullable = true)
+ |-- version: integer (nullable = true)
+ |-- timestamp: long (nullable = true)
+ |-- changeset: long (nullable = true)
+ |-- uid: integer (nullable = true)
+ |-- user_sid: string (nullable = true)
+ |-- tags: array (nullable = true)
+ |    |-- element: struct (containsNull = true)
+ |    |    |-- key: string (nullable = true)
+ |    |    |-- value: string (nullable = true)
+ |-- latitude: double (nullable = true)
+ |-- longitude: double (nullable = true)
 
-message way {
-  required int64 id;
-  optional int32 version;
-  optional int64 timestamp;
-  optional int64 changeset;
-  optional int32 uid;
-  optional binary user_sid;
-  repeated group tags {
-    required binary key;
-    optional binary value;
-  }
-  repeated int64 nodes;
-}
+way
+ |-- id: long (nullable = true)
+ |-- version: integer (nullable = true)
+ |-- timestamp: long (nullable = true)
+ |-- changeset: long (nullable = true)
+ |-- uid: integer (nullable = true)
+ |-- user_sid: string (nullable = true)
+ |-- tags: array (nullable = true)
+ |    |-- element: struct (containsNull = true)
+ |    |    |-- key: string (nullable = true)
+ |    |    |-- value: string (nullable = true)
+ |-- nodes: array (nullable = true)
+ |    |-- element: struct (containsNull = true)
+ |    |    |-- index: integer (nullable = true)
+ |    |    |-- nodeId: long (nullable = true)
 
-message relation {
-  required int64 id;
-  optional int32 version;
-  optional int64 timestamp;
-  optional int64 changeset;
-  optional int32 uid;
-  optional binary user_sid;
-  repeated group tags {
-    required binary key;
-    optional binary value;
-  }
-  repeated int64 members;
-}
+relation
+ |-- id: long (nullable = true)
+ |-- version: integer (nullable = true)
+ |-- timestamp: long (nullable = true)
+ |-- changeset: long (nullable = true)
+ |-- uid: integer (nullable = true)
+ |-- user_sid: string (nullable = true)
+ |-- tags: array (nullable = true)
+ |    |-- element: struct (containsNull = true)
+ |    |    |-- key: string (nullable = true)
+ |    |    |-- value: string (nullable = true)
+ |-- members: array (nullable = true)
+ |    |-- element: struct (containsNull = true)
+ |    |    |-- id: long (nullable = true)
+ |    |    |-- role: string (nullable = true)
+ |    |    |-- type: string (nullable = true)
 ```
