@@ -33,49 +33,49 @@ The parquet files have the following schemas:
 
 ```probobuf
 node
- |-- id: long (nullable = true)
- |-- version: integer (nullable = true)
- |-- timestamp: long (nullable = true)
- |-- changeset: long (nullable = true)
- |-- uid: integer (nullable = true)
- |-- user_sid: string (nullable = true)
- |-- tags: array (nullable = true)
- |    |-- element: struct (containsNull = true)
- |    |    |-- key: string (nullable = true)
- |    |    |-- value: string (nullable = true)
- |-- latitude: double (nullable = true)
- |-- longitude: double (nullable = true)
+ |-- id: long
+ |-- version: integer
+ |-- timestamp: long
+ |-- changeset: long
+ |-- uid: integer
+ |-- user_sid: string
+ |-- tags: array
+ |    |-- element: struct
+ |    |    |-- key: string
+ |    |    |-- value: string
+ |-- latitude: double
+ |-- longitude: double
 
 way
- |-- id: long (nullable = true)
- |-- version: integer (nullable = true)
- |-- timestamp: long (nullable = true)
- |-- changeset: long (nullable = true)
- |-- uid: integer (nullable = true)
- |-- user_sid: string (nullable = true)
- |-- tags: array (nullable = true)
- |    |-- element: struct (containsNull = true)
- |    |    |-- key: string (nullable = true)
- |    |    |-- value: string (nullable = true)
- |-- nodes: array (nullable = true)
- |    |-- element: struct (containsNull = true)
- |    |    |-- index: integer (nullable = true)
- |    |    |-- nodeId: long (nullable = true)
+ |-- id: long
+ |-- version: integer
+ |-- timestamp: long
+ |-- changeset: long
+ |-- uid: integer
+ |-- user_sid: string
+ |-- tags: array
+ |    |-- element: struct
+ |    |    |-- key: string
+ |    |    |-- value: string
+ |-- nodes: array
+ |    |-- element: struct
+ |    |    |-- index: integer
+ |    |    |-- nodeId: long
 
 relation
- |-- id: long (nullable = true)
- |-- version: integer (nullable = true)
- |-- timestamp: long (nullable = true)
- |-- changeset: long (nullable = true)
- |-- uid: integer (nullable = true)
- |-- user_sid: string (nullable = true)
- |-- tags: array (nullable = true)
- |    |-- element: struct (containsNull = true)
- |    |    |-- key: string (nullable = true)
- |    |    |-- value: string (nullable = true)
- |-- members: array (nullable = true)
- |    |-- element: struct (containsNull = true)
- |    |    |-- id: long (nullable = true)
- |    |    |-- role: string (nullable = true)
- |    |    |-- type: string (nullable = true)
+ |-- id: long
+ |-- version: integer
+ |-- timestamp: long
+ |-- changeset: long
+ |-- uid: integer
+ |-- user_sid: string
+ |-- tags: array
+ |    |-- element: struct
+ |    |    |-- key: string
+ |    |    |-- value: string
+ |-- members: array
+ |    |-- element: struct
+ |    |    |-- id: long
+ |    |    |-- role: string
+ |    |    |-- type: string
 ```
