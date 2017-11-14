@@ -1,6 +1,6 @@
 ## OpenStreetMap Parquetizer
 
-*Update: [Telenav](https://www.telenav.org) publishes weekly planet Parquet files at [osm-data.skobbler.net](http://osm-data.skobbler.net)*
+*Update: [Telenav](https://www.telenav.com) publishes weekly planet Parquet files at [osm-data.skobbler.net](http://osm-data.skobbler.net)*
 
 [![Build Status](https://travis-ci.org/adrianulbona/hmm.svg)](https://travis-ci.org/adrianulbona/osm-parquetizer)
 
