@@ -8,21 +8,27 @@
     <name>OSM Parquetizer</name>
     <url>http://maven.apache.org</url>
     <properties>
-        <osmosis.version>0.44.1</osmosis.version>
-        <parquet.version>1.8.1</parquet.version>
-        <hadoop.version>2.7.2</hadoop.version>
+        <osmosis.version>0.48.2</osmosis.version>
+        <parquet.version>1.11.0</parquet.version>
+        <hadoop.version>3.3.0</hadoop.version>
         <encoding>UTF-8</encoding>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.openstreetmap.osmosis</groupId>
-            <artifactId>osmosis-pbf</artifactId>
+            <artifactId>osmosis-pbf2</artifactId>
             <version>${osmosis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.parquet</groupId>
             <artifactId>parquet-hadoop</artifactId>
             <version>${parquet.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>

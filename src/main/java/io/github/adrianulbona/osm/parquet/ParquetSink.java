@@ -71,7 +71,7 @@ public class ParquetSink<T extends Entity> implements Sink {
     }
 
     @Override
-    public void release() {
+    public void close() {
 
     }
 

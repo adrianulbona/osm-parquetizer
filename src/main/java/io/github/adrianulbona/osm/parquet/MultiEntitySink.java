@@ -3,8 +3,8 @@ package io.github.adrianulbona.osm.parquet;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
+import org.openstreetmap.osmosis.core.lifecycle.Closeable;
 import org.openstreetmap.osmosis.core.lifecycle.Completable;
-import org.openstreetmap.osmosis.core.lifecycle.Releasable;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
 import java.nio.file.Path;
@@ -50,8 +50,8 @@ public class MultiEntitySink implements Sink {
     }
 
     @Override
-    public void release() {
-        this.converters.forEach(Releasable::release);
+    public void close() {
+        this.converters.forEach(Closeable::close);
     }
 
     public void addObserver(Observer observer) {
