@@ -1,12 +1,12 @@
 package io.github.adrianulbona.osm.parquet;
 
-import crosby.binary.osmosis.OsmosisReader;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
+import org.openstreetmap.osmosis.pbf2.v0_6.PbfReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static java.nio.file.Files.newInputStream;
 import static java.util.Collections.unmodifiableList;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Relation;
@@ -32,7 +31,7 @@ public class App {
         final CmdLineParser cmdLineParser = new CmdLineParser(config);
         try {
             cmdLineParser.parseArgument(args);
-            final OsmosisReader reader = new OsmosisReader(newInputStream(config.getSource()));
+            final PbfReader reader = new PbfReader(config.getSource().toFile(), config.threads);
             final MultiEntitySink sink = new MultiEntitySink(config);
             sink.addObserver(new MultiEntitySinkObserver());
             reader.setSink(sink);
@@ -53,6 +52,9 @@ public class App {
         @Argument(index = 1, metaVar = "output-path", usage = "the directory where to store the Parquet files",
                 required = false)
         private Path destinationFolder;
+
+        @Option(name = "--pbf-threads", usage = "if present number of threads for PbfReader")
+        private int threads = 1;
 
         @Option(name = "--exclude-metadata", usage = "if present the metadata will not be parquetized")
         private boolean excludeMetadata = false;
