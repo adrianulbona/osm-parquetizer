@@ -1,19 +1,15 @@
 package io.github.adrianulbona.osm.parquet.convertor;
 
 import org.apache.parquet.io.api.Binary;
-import org.apache.parquet.schema.GroupType;
-import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.PrimitiveType;
-import org.apache.parquet.schema.Type;
+import org.apache.parquet.schema.*;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.parquet.schema.LogicalTypeAnnotation.*;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64;
-import static org.apache.parquet.schema.Type.Repetition.REPEATED;
-import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 
 /**
@@ -28,10 +24,10 @@ public class RelationWriteSupport extends OsmEntityWriteSupport<Relation> {
 
     public RelationWriteSupport(boolean excludeMetadata) {
         super(excludeMetadata);
-        memberIdType = new PrimitiveType(REQUIRED, INT64, "id");
-        memberRoleType = new PrimitiveType(REQUIRED, BINARY, "role");
-        memberTypeType = new PrimitiveType(REQUIRED, BINARY, "type");
-        membersType = new GroupType(REPEATED, "members", memberIdType, memberRoleType, memberTypeType);
+        memberIdType = Types.required(INT64).named("id");
+        memberRoleType = Types.required(BINARY).as(stringType()).named("role");
+        memberTypeType = Types.required(BINARY).as(stringType()).named("type");
+        membersType = Types.repeatedGroup().addFields(memberIdType, memberRoleType, memberTypeType).named("members");
     }
 
     @Override

@@ -1,9 +1,6 @@
 package io.github.adrianulbona.osm.parquet.convertor;
 
-import org.apache.parquet.schema.GroupType;
-import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.PrimitiveType;
-import org.apache.parquet.schema.Type;
+import org.apache.parquet.schema.*;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 
@@ -15,8 +12,6 @@ import java.util.Map;
 import static java.util.stream.IntStream.range;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT32;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64;
-import static org.apache.parquet.schema.Type.Repetition.REPEATED;
-import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 
 /**
@@ -30,9 +25,9 @@ public class WayWriteSupport extends OsmEntityWriteSupport<Way> {
 
     public WayWriteSupport(boolean excludeMetadata) {
         super(excludeMetadata);
-        nodeIndexType = new PrimitiveType(REQUIRED, INT32, "index");
-        nodeIdType = new PrimitiveType(REQUIRED, INT64, "nodeId");
-        nodes = new GroupType(REPEATED, "nodes", nodeIndexType, nodeIdType);
+        nodeIndexType = Types.required(INT32).named("index");
+        nodeIdType = Types.required(INT64).named("nodeId");
+        nodes = Types.repeatedGroup().addFields(nodeIndexType, nodeIdType).named("nodes");
     }
 
     @Override

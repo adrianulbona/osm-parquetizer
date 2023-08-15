@@ -4,10 +4,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.hadoop.api.WriteSupport;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.io.api.RecordConsumer;
-import org.apache.parquet.schema.GroupType;
-import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.PrimitiveType;
-import org.apache.parquet.schema.Type;
+import org.apache.parquet.schema.*;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 
@@ -16,8 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.apache.parquet.schema.LogicalTypeAnnotation.*;
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.*;
-import static org.apache.parquet.schema.Type.Repetition.*;
 
 
 /**
@@ -40,15 +37,15 @@ public abstract class OsmEntityWriteSupport<E extends Entity> extends WriteSuppo
     protected RecordConsumer recordConsumer;
 
     public OsmEntityWriteSupport(boolean excludeMetadata) {
-        idType = new PrimitiveType(REQUIRED, INT64, "id");
-        tagKeyType = new PrimitiveType(REQUIRED, BINARY, "key");
-        tagValueType = new PrimitiveType(OPTIONAL, BINARY, "value");
-        tags = new GroupType(REPEATED, "tags", tagKeyType, tagValueType);
-        versionType = new PrimitiveType(OPTIONAL, INT32, "version");
-        timestampType = new PrimitiveType(OPTIONAL, INT64, "timestamp");
-        changesetType = new PrimitiveType(OPTIONAL, INT64, "changeset");
-        uidType = new PrimitiveType(OPTIONAL, INT32, "uid");
-        userSidType = new PrimitiveType(OPTIONAL, BINARY, "user_sid");
+        idType = Types.required(INT64).named("id");
+        tagKeyType = Types.required(BINARY).as(stringType()).named("key");
+        tagValueType = Types.optional(BINARY).as(stringType()).named("value");
+        tags = Types.repeatedGroup().addFields(tagKeyType, tagValueType).named("tags");
+        versionType = Types.optional(INT32).named("version");
+        timestampType = Types.optional(INT64).named("timestamp");
+        changesetType = Types.optional(INT64).named("changeset");
+        uidType = Types.optional(INT32).named("uid");
+        userSidType = Types.optional(BINARY).as(stringType()).named("user_sid");
         this.excludeMetadata = excludeMetadata;
     }
 
